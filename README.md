@@ -20,14 +20,6 @@ A Django web application that allows users to interact with RESTful APIs through
 - Redis (caching)
 - Bootstrap 5 (frontend styling)
 
-## Installation
-
-### Prerequisites
-
-- Python 3.8+
-- PostgreSQL
-- Redis
-
 ### Setup
 
 1. Clone the repository:
@@ -102,6 +94,3 @@ python manage.py test
 python manage.py makemigrations
 ```
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
