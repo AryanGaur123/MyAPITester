@@ -1,4 +1,4 @@
-# Simple API Tester
+# API Tester
 
 A Django web application that allows users to interact with RESTful APIs through a clean, intuitive web interface.
 
