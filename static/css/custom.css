@@ -1,0 +1,76 @@
+/* Custom styles for the API Tester application */
+
+.json-key {
+    color: #0d6efd;
+}
+
+.json-string {
+    color: #198754;
+}
+
+.json-number {
+    color: #fd7e14;
+}
+
+.json-boolean {
+    color: #dc3545;
+}
+
+.json-null {
+    color: #6c757d;
+}
+
+/* Method badge styles */
+.method-get {
+    background-color: #0d6efd;
+}
+
+.method-post {
+    background-color: #198754;
+}
+
+.method-put {
+    background-color: #fd7e14;
+}
+
+.method-delete {
+    background-color: #dc3545;
+}
+
+/* Response status indicator */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.status-2xx {
+    background-color: #198754;
+}
+
+.status-3xx {
+    background-color: #fd7e14;
+}
+
+.status-4xx, .status-5xx {
+    background-color: #dc3545;
+}
+
+/* Form improvements */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    pre {
+        max-height: 300px;
+    }
+}

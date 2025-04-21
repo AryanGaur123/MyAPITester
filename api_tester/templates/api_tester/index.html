@@ -1,0 +1,159 @@
+{% extends 'api_tester/base.html' %}
+
+{% block title %}API Tester - Make API Requests{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Make a Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.url.id_for_label }}" class="form-label">API URL</label>
+                        {{ form.url }}
+                        {% if form.url.errors %}
+                            <div class="text-danger mt-1">{{ form.url.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.method.id_for_label }}" class="form-label">HTTP Method</label>
+                        {{ form.method }}
+                        {% if form.method.errors %}
+                            <div class="text-danger mt-1">{{ form.method.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.headers.id_for_label }}" class="form-label">Headers</label>
+                        {{ form.headers }}
+                        <div class="form-text mt-1">{{ form.headers.help_text }}</div>
+                        {% if form.headers.errors %}
+                            <div class="text-danger mt-1">{{ form.headers.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.body.id_for_label }}" class="form-label">Request Body</label>
+                        {{ form.body }}
+                        <div class="form-text mt-1">{{ form.body.help_text }}</div>
+                        {% if form.body.errors %}
+                            <div class="text-danger mt-1">{{ form.body.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Send Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        {% if error_message %}
+            <div class="alert alert-danger">
+                {{ error_message }}
+            </div>
+        {% endif %}
+        
+        {% if api_response %}
+            <div class="card {% if api_response.status_code < 300 %}response-success{% elif api_response.status_code < 400 %}response-warning{% elif api_response.status_code < 500 %}response-error{% else %}response-error{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Response</h5>
+                    <span class="badge {% if api_response.status_code < 300 %}bg-success{% elif api_response.status_code < 400 %}bg-warning text-dark{% elif api_response.status_code < 500 %}bg-danger{% else %}bg-danger{% endif %}">
+                        Status: {{ api_response.status_code }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="responseTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="body-tab" data-bs-toggle="tab" data-bs-target="#body" type="button" role="tab" aria-controls="body" aria-selected="true">Body</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="headers-tab" data-bs-toggle="tab" data-bs-target="#headers" type="button" role="tab" aria-controls="headers" aria-selected="false">Headers</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3" id="responseTabsContent">
+                        <div class="tab-pane fade show active" id="body" role="tabpanel" aria-labelledby="body-tab">
+                            <pre><code class="json-formatter">{{ api_response.body|safe }}</code></pre>
+                        </div>
+                        <div class="tab-pane fade" id="headers" role="tabpanel" aria-labelledby="headers-tab">
+                            <pre><code class="json-formatter">{{ api_response.headers|safe }}</code></pre>
+                        </div>
+                    </div>
+                    {% if api_response.time %}
+                        <div class="mt-3 text-muted">
+                            <small>Request completed in {{ api_response.time|floatformat:3 }} seconds</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Response</h5>
+                </div>
+                <div class="card-body text-center py-5">
+                    <p class="text-muted mb-0">Make a request to see the response here</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if recent_requests %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Request History</h5>
+                <form method="post" action="{% url 'clear_history' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Clear History</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover history-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in recent_requests %}
+                            <tr>
+                                <td>
+                                    <span class="badge {% if request.method == 'GET' %}bg-primary{% elif request.method == 'POST' %}bg-success{% elif request.method == 'PUT' %}bg-warning text-dark{% elif request.method == 'DELETE' %}bg-danger{% endif %}">
+                                        {{ request.method }}
+                                    </span>
+                                </td>
+                                <td class="text-truncate" style="max-width: 300px;">{{ request.url }}</td>
+                                <td>
+                                    <span class="badge status-badge {% if request.response_status < 300 %}bg-success{% elif request.response_status < 400 %}bg-warning text-dark{% elif request.response_status < 500 %}bg-danger{% else %}bg-danger{% endif %}">
+                                        {{ request.response_status }}
+                                    </span>
+                                </td>
+                                <td>{{ request.created_at|date:"M d, Y H:i:s" }}</td>
+                                <td>
+                                    <a href="{% url 'request_detail' request.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

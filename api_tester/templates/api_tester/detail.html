@@ -1,0 +1,93 @@
+{% extends 'api_tester/base.html' %}
+
+{% block title %}API Request Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="{% url 'index' %}" class="btn btn-outline-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Request Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">URL</h6>
+                    <div class="p-2 bg-light rounded border">
+                        <span class="text-break">{{ api_request.url }}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Method</h6>
+                    <span class="badge {% if api_request.method == 'GET' %}bg-primary{% elif api_request.method == 'POST' %}bg-success{% elif api_request.method == 'PUT' %}bg-warning text-dark{% elif api_request.method == 'DELETE' %}bg-danger{% endif %}">
+                        {{ api_request.method }}
+                    </span>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Time</h6>
+                    <p class="mb-0">{{ api_request.created_at|date:"F d, Y H:i:s" }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Headers</h6>
+                    <pre><code class="json-formatter">{{ api_request.headers|safe }}</code></pre>
+                </div>
+                
+                {% if api_request.request_body %}
+                <div class="mb-4">
+                    <h6 class="text-secondary mb-2">Request Body</h6>
+                    <pre><code class="json-formatter">{{ api_request.request_body|safe }}</code></pre>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card {% if api_request.response_status < 300 %}response-success{% elif api_request.response_status < 400 %}response-warning{% elif api_request.response_status < 500 %}response-error{% else %}response-error{% endif %}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Response</h5>
+                <span class="badge {% if api_request.response_status < 300 %}bg-success{% elif api_request.response_status < 400 %}bg-warning text-dark{% elif api_request.response_status < 500 %}bg-danger{% else %}bg-danger{% endif %}">
+                    Status: {{ api_request.response_status }}
+                </span>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="responseTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="body-tab" data-bs-toggle="tab" data-bs-target="#body" type="button" role="tab" aria-controls="body" aria-selected="true">Body</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="headers-tab" data-bs-toggle="tab" data-bs-target="#headers" type="button" role="tab" aria-controls="headers" aria-selected="false">Headers</button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="responseTabsContent">
+                    <div class="tab-pane fade show active" id="body" role="tabpanel" aria-labelledby="body-tab">
+                        <pre><code class="json-formatter">{{ api_response.body|safe }}</code></pre>
+                    </div>
+                    <div class="tab-pane fade" id="headers" role="tabpanel" aria-labelledby="headers-tab">
+                        <pre><code class="json-formatter">{{ api_response.headers|safe }}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                Make Another Request
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
